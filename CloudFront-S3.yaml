@@ -1,0 +1,55 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  S3bucket:
+    Description: Name of an existing s3 bucket
+    Type: String
+    ConstraintDescription: must be the name of an existing bucket.
+#  Domain:
+#    Description: Domain Name    
+#    Type: String
+Resources:
+  myDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Origins:
+        - DomainName: !Ref S3bucket
+          Id: myS3Origin
+          S3OriginConfig:
+            OriginAccessIdentity: origin-access-identity/cloudfront/E127EXAMPLE51Z
+        Enabled: 'true'
+        Comment: Some comment
+#        DefaultRootObject: index.html
+#        Logging:
+#          IncludeCookies: 'false'
+#          Bucket: mylogs.s3.amazonaws.com
+#          Prefix: myprefix
+#        Aliases: 
+#          - !Ref Domain
+        DefaultCacheBehavior:
+          AllowedMethods:
+          - DELETE
+          - GET
+          - HEAD
+          - OPTIONS
+          - PATCH
+          - POST
+          - PUT
+          TargetOriginId: myS3Origin
+          ForwardedValues:
+            QueryString: 'false'
+            Cookies:
+              Forward: none
+          TrustedSigners:
+          - 1234567890EX
+          - 1234567891EX
+          ViewerProtocolPolicy: allow-all
+        PriceClass: PriceClass_200
+        Restrictions:
+          GeoRestriction:
+            RestrictionType: whitelist
+            Locations:
+            - AQ
+            - CV
+        ViewerCertificate:
+          CloudFrontDefaultCertificate: 'true'
